@@ -1,25 +1,106 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react'    // useEffect - to fetch the products immidiately when application loads
+import Products from './components/Products/Products'
+import Navbar from './components/Navbar/Navbar'
 
-function App() {
+import { commerce } from './lib/commerce'
+import Cart from './components/Cart/Cart'
+
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+
+import Checkout from './components/Checkout/CheckoutForm/Checkout'
+
+// import { Navbar, Products } from './components'   // we can do this coz of index file in components
+
+const App = () => {
+
+  const [products, setProducts] = useState([]);
+  const [cart, setCart] = useState({})
+  const [order, setOrder] = useState({})
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const fetchProducts = async () => {
+    const { data } = await commerce.products.list()
+
+    setProducts(data);
+  }
+
+  const fetchCart = async () => {
+    setCart(await commerce.cart.retrieve())
+  }
+
+  const addToCart = async (productId, quantity) => {
+    const response = await commerce.cart.add(productId, quantity)
+
+    setCart(response.cart)
+  }
+
+  const updateQty = async (productId, quantity) => {
+    const response = await commerce.cart.update(productId, { quantity })
+
+    setCart(response.cart)
+  }
+
+  const deleteFromCart = async (productId) => {
+    const resposne = await commerce.cart.remove(productId)
+
+    setCart(resposne.cart)
+  }
+
+  const emptyCart = async () => {
+    const response = await commerce.cart.empty()
+
+    setCart(response.cart)
+  }
+
+  const refreshCart = async () => {
+    const newCart = await commerce.cart.refresh()
+
+    setCart(newCart)
+  }
+
+  const captureCheckout = async (checkoutTokenId, newOrder) => {
+    try {
+      const incomingOrder = await commerce.checkout.capture(checkoutTokenId, newOrder)
+
+      setOrder(incomingOrder)
+      console.log(incomingOrder)
+      refreshCart()
+    } catch (error) {
+      setErrorMessage(error.data.error.message)
+    }
+  }
+
+  useEffect(() => {
+    fetchProducts()
+    fetchCart()
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <Router basename={process.env.PUBLIC_URL}>
+    <div>
+      <Navbar totalItems={cart.total_items} />
+      <Routes>
+
+        <Route exact path='/' element={<Products products = {products} addToCart = {addToCart} />} />
+
+        <Route exact path='/cart' element={
+        <Cart
+        cart={cart}
+        updateQty={updateQty}
+        deleteFromCart={deleteFromCart}
+        emptyCart={emptyCart} />} />
+
+        <Route exact path='/checkout' element={<Checkout
+        cart={cart} 
+        order={order}
+        onCaptureCheckout={captureCheckout}
+        error={errorMessage}
+        />} />
+
+      </Routes>
+      </div>
+      </Router>
+  )
 }
 
-export default App;
+export default App
