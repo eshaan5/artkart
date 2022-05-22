@@ -1,11 +1,14 @@
 {
   "files": {
-    "main.js": "/artkart/static/js/main.86ab661c.js",
+    "main.css": "/artkart/static/css/main.0fb3aa08.css",
+    "main.js": "/artkart/static/js/main.0c5e02e8.js",
     "static/media/artkart.png": "/artkart/static/media/artkart.63ede0d13d32c9d34000.png",
     "index.html": "/artkart/index.html",
-    "main.86ab661c.js.map": "/artkart/static/js/main.86ab661c.js.map"
+    "main.0fb3aa08.css.map": "/artkart/static/css/main.0fb3aa08.css.map",
+    "main.0c5e02e8.js.map": "/artkart/static/js/main.0c5e02e8.js.map"
   },
   "entrypoints": [
-    "static/js/main.86ab661c.js"
+    "static/css/main.0fb3aa08.css",
+    "static/js/main.0c5e02e8.js"
   ]
 }
