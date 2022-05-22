@@ -17,6 +17,7 @@ const App = () => {
   const [cart, setCart] = useState({})
   const [order, setOrder] = useState({})
   const [errorMessage, setErrorMessage] = useState('')
+  const [search, setSearch] = useState('')
 
   const fetchProducts = async () => {
     const { data } = await commerce.products.list()
@@ -27,6 +28,15 @@ const App = () => {
   const fetchCart = async () => {
     setCart(await commerce.cart.retrieve())
   }
+
+  const onSearch = (e) => {
+    setSearch(e.target.value)
+}
+
+const filtered = products.filter((product) => {
+  return product.name.toLowerCase().includes(search.toLowerCase()) || product.description.toLowerCase().includes(search.toLowerCase())
+})
+
 
   const addToCart = async (productId, quantity) => {
     const response = await commerce.cart.add(productId, quantity)
@@ -78,10 +88,10 @@ const App = () => {
   return (
     <Router basename={process.env.PUBLIC_URL}>
     <div>
-      <Navbar totalItems={cart.total_items} />
+      <Navbar totalItems={cart.total_items} onSearch={onSearch} search={search} />
       <Routes>
 
-        <Route exact path='/' element={<Products products = {products} addToCart = {addToCart} />} />
+        <Route exact path='/' element={<Products products = {filtered} addToCart = {addToCart} />} />
 
         <Route exact path='/cart' element={
         <Cart
